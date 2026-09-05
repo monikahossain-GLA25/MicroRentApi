@@ -1,3 +1,6 @@
+using MicroRentApi.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +10,12 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+builder.Services.AddDbContext<MicroRentDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString(
+            "MicroRentConnectionString")));
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
