@@ -1,0 +1,6 @@
+@MicroRentApi_HostAddress = http://localhost:5081
+
+GET {{MicroRentApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
