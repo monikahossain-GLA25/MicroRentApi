@@ -1,6 +1,6 @@
 ﻿namespace MicroRentApi.Models.Domain
 {
-    public class TrailDifficulty
+    public class Payment
     {
 
         public Guid Id { get; set; }
