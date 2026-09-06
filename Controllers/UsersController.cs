@@ -20,5 +20,16 @@ namespace MicroRentApi.Controllers
             var user = microRentDbContext.Users.ToList();
             return Ok(user);
         }
+        [HttpGet("{id:guid}")]
+        public IActionResult GetById([FromRoute] Guid id)
+        {
+            var user = microRentDbContext.Users.Find(id);
+            if (user == null)
+            {
+                return NotFound();
+
+            }
+            return Ok(user);
+        }
     }
 }
