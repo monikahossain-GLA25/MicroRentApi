@@ -1,7 +1,9 @@
 ﻿using MicroRentApi.Data;
 using MicroRentApi.Models.Domain;
+using MicroRentApi.Models.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace MicroRentApi.Controllers
 {
@@ -18,18 +20,47 @@ namespace MicroRentApi.Controllers
         public IActionResult GetAll()
         {
             var user = microRentDbContext.Users.ToList();
-            return Ok(user);
+
+            var userDto =  new List<Models.DTO.UserDto>();
+
+            foreach(var userDomain in user)
+            {
+                userDto.Add(new Models.DTO.UserDto()
+                {
+                    Id = userDomain.Id,
+                    Code = userDomain.Code,
+                    Name = userDomain.Name,
+                    UserImageUrl = userDomain.UserImageUrl
+                });
+            }
+            return Ok(userDto);
         }
         [HttpGet("{id:guid}")]
+       
         public IActionResult GetById([FromRoute] Guid id)
         {
-            var user = microRentDbContext.Users.Find(id);
-            if (user == null)
+            // Get Domain Model
+            var userDomain = microRentDbContext.Users
+                .FirstOrDefault(x => x.Id == id);
+
+            if (userDomain == null)
             {
                 return NotFound();
-
             }
-            return Ok(user);
+
+
+            // Map Domain Model to DTO
+            var userDto = new UserDto
+            {
+                Id = userDomain.Id,
+                Code = userDomain.Code,
+                Name = userDomain.Name,
+                UserImageUrl = userDomain.UserImageUrl
+            };
+
+
+            // Return DTO
+            return Ok(userDto);
         }
     }
 }
