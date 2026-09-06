@@ -1,4 +1,5 @@
-﻿using MicroRentApi.Models.Domain;
+﻿using MicroRentApi.Data;
+using MicroRentApi.Models.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,27 +9,16 @@ namespace MicroRentApi.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly MicroRentDbContext microRentDbContext;
+
+        public UsersController(MicroRentDbContext microRentDbContext) {
+            this.microRentDbContext = microRentDbContext;
+        }
         [HttpGet]
         public IActionResult GetAll()
         {
-            var users = new List<User>()
-            {
-                new User
-                {
-                    Id = Guid.NewGuid(),
-                    Code = "U001",
-                    Name = "Monika Hossain",
-                    UserImageUrl = "https://example.com/images/monika.jpg"
-                },
-                new User
-                {
-                    Id = Guid.NewGuid(),
-                    Code = "U003",
-                    Name = "Hossain Monika",
-                    UserImageUrl = "https://example.com/images/hossain.jpg"
-                },
-            };
-            return Ok(users);
+            var user = microRentDbContext.Users.ToList();
+            return Ok(user);
         }
     }
 }
