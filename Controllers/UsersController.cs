@@ -62,5 +62,31 @@ namespace MicroRentApi.Controllers
             // Return DTO
             return Ok(userDto);
         }
+
+        [HttpPost]
+        public IActionResult Create([FromBody]AddUserRequestDto addUserRequestDto)
+        {
+            var userDomainModel = new Models.Domain.User
+            {
+                Code = addUserRequestDto.Code,
+                Name = addUserRequestDto.Name,
+                UserImageUrl = addUserRequestDto.UserImageUrl
+            };
+
+            microRentDbContext.Users.Add(userDomainModel);
+            microRentDbContext.SaveChanges();
+
+            var userDto = new UserDto
+            {
+                Id = userDomainModel.Id,
+                Code = userDomainModel.Code,
+                Name = userDomainModel.Name,
+                UserImageUrl = userDomainModel.UserImageUrl
+            };
+            return CreatedAtAction(
+        nameof(GetById),
+        new { id = userDto.Id },
+        userDto);
+        }
     }
 }
