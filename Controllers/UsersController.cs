@@ -21,9 +21,9 @@ namespace MicroRentApi.Controllers
         {
             var user = microRentDbContext.Users.ToList();
 
-            var userDto =  new List<Models.DTO.UserDto>();
+            var userDto = new List<Models.DTO.UserDto>();
 
-            foreach(var userDomain in user)
+            foreach (var userDomain in user)
             {
                 userDto.Add(new Models.DTO.UserDto()
                 {
@@ -36,7 +36,7 @@ namespace MicroRentApi.Controllers
             return Ok(userDto);
         }
         [HttpGet("{id:guid}")]
-       
+
         public IActionResult GetById([FromRoute] Guid id)
         {
             // Get Domain Model
@@ -63,8 +63,8 @@ namespace MicroRentApi.Controllers
             return Ok(userDto);
         }
 
-        [HttpPost]
-        public IActionResult Create([FromBody]AddUserRequestDto addUserRequestDto)
+        [HttpPut("{id:guid}")]
+        public IActionResult Create([FromBody] AddUserRequestDto addUserRequestDto)
         {
             var userDomainModel = new Models.Domain.User
             {
@@ -87,6 +87,32 @@ namespace MicroRentApi.Controllers
         nameof(GetById),
         new { id = userDto.Id },
         userDto);
+        }
+        [HttpPost("{id:guid}")]
+        public IActionResult Update([FromRoute]Guid id , [FromBody]UpdateUserRequestDto updateUserRequestDto)
+        {
+            var userDominModel = microRentDbContext.Users.FirstOrDefault(x => x.Id == id);
+
+            if(userDominModel == null)
+            {
+                return NotFound();
+            }
+          
+            userDominModel.Code = updateUserRequestDto.Code;
+            userDominModel.Name = updateUserRequestDto.Name;
+            userDominModel.UserImageUrl = updateUserRequestDto.UserImageUrl;
+
+            microRentDbContext.SaveChanges();
+
+
+            var userDto = new UserDto
+            {
+                Id = userDominModel.Id,
+                Code = userDominModel.Code,
+                Name = userDominModel.Name,
+                UserImageUrl = userDominModel.UserImageUrl
+            };
+            return Ok(userDto);
         }
     }
 }
