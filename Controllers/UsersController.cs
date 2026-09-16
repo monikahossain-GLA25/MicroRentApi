@@ -114,5 +114,27 @@ namespace MicroRentApi.Controllers
             };
             return Ok(userDto);
         }
+        [HttpDelete("{id:guid}")]
+        
+        public IActionResult Delete([FromRoute] Guid id)
+        {
+            var userDomainModel = microRentDbContext.Users.FirstOrDefault(x => x.Id == id);
+            if (userDomainModel == null)
+            {
+                return NotFound();
+        
+            }
+            microRentDbContext.Users.Remove(userDomainModel);
+            microRentDbContext.SaveChanges();
+
+            var userDto = new UserDto
+            {
+                Id = userDomainModel.Id,
+                Code = userDomainModel.Code,
+                Name = userDomainModel.Name,
+                UserImageUrl = userDomainModel.UserImageUrl
+            }; 
+            return Ok(userDto);
+        }
     }
 }
