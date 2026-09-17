@@ -63,7 +63,7 @@ namespace MicroRentApi.Controllers
             return Ok(userDto);
         }
 
-        [HttpPut("{id:guid}")]
+        [HttpPost]
         public IActionResult Create([FromBody] AddUserRequestDto addUserRequestDto)
         {
             var userDomainModel = new Models.Domain.User
@@ -88,8 +88,10 @@ namespace MicroRentApi.Controllers
         new { id = userDto.Id },
         userDto);
         }
-        [HttpPost("{id:guid}")]
-        public IActionResult Update([FromRoute]Guid id , [FromBody]UpdateUserRequestDto updateUserRequestDto)
+        [HttpPut("{id:guid}")]
+        public IActionResult Update(
+     [FromRoute] Guid id,
+     [FromBody] UpdateUserRequestDto updateUserRequestDto)
         {
             var userDominModel = microRentDbContext.Users.FirstOrDefault(x => x.Id == id);
 
