@@ -17,15 +17,16 @@ namespace MicroRentApi.Controllers
             this.microRentDbContext = microRentDbContext;
         }
         [HttpGet]
-        public IActionResult GetAll()
+       
+        public async Task<IActionResult> GetAll()
         {
-            var user = microRentDbContext.Users.ToList();
+            var users = await microRentDbContext.Users.ToListAsync();
 
-            var userDto = new List<Models.DTO.UserDto>();
+            var userDto = new List<UserDto>();
 
-            foreach (var userDomain in user)
+            foreach (var userDomain in users)
             {
-                userDto.Add(new Models.DTO.UserDto()
+                userDto.Add(new UserDto
                 {
                     Id = userDomain.Id,
                     Code = userDomain.Code,
@@ -33,23 +34,22 @@ namespace MicroRentApi.Controllers
                     UserImageUrl = userDomain.UserImageUrl
                 });
             }
+
             return Ok(userDto);
         }
         [HttpGet("{id:guid}")]
 
-        public IActionResult GetById([FromRoute] Guid id)
+       
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            // Get Domain Model
-            var userDomain = microRentDbContext.Users
-                .FirstOrDefault(x => x.Id == id);
+            var userDomain = await microRentDbContext.Users
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (userDomain == null)
             {
                 return NotFound();
             }
 
-
-            // Map Domain Model to DTO
             var userDto = new UserDto
             {
                 Id = userDomain.Id,
@@ -58,23 +58,24 @@ namespace MicroRentApi.Controllers
                 UserImageUrl = userDomain.UserImageUrl
             };
 
-
-            // Return DTO
             return Ok(userDto);
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] AddUserRequestDto addUserRequestDto)
+
+        public async Task<IActionResult> Create(
+    [FromBody] AddUserRequestDto addUserRequestDto)
         {
-            var userDomainModel = new Models.Domain.User
+            var userDomainModel = new User
             {
                 Code = addUserRequestDto.Code,
                 Name = addUserRequestDto.Name,
                 UserImageUrl = addUserRequestDto.UserImageUrl
             };
 
-            microRentDbContext.Users.Add(userDomainModel);
-            microRentDbContext.SaveChanges();
+            await microRentDbContext.Users.AddAsync(userDomainModel);
+
+            await microRentDbContext.SaveChangesAsync();
 
             var userDto = new UserDto
             {
@@ -83,51 +84,31 @@ namespace MicroRentApi.Controllers
                 Name = userDomainModel.Name,
                 UserImageUrl = userDomainModel.UserImageUrl
             };
+
             return CreatedAtAction(
-        nameof(GetById),
-        new { id = userDto.Id },
-        userDto);
+                nameof(GetById),
+                new { id = userDto.Id },
+                userDto);
         }
         [HttpPut("{id:guid}")]
-        public IActionResult Update(
-     [FromRoute] Guid id,
-     [FromBody] UpdateUserRequestDto updateUserRequestDto)
+  
+        public async Task<IActionResult> Update(
+    [FromRoute] Guid id,
+    [FromBody] UpdateUserRequestDto updateUserRequestDto)
         {
-            var userDominModel = microRentDbContext.Users.FirstOrDefault(x => x.Id == id);
+            var userDomainModel = await microRentDbContext.Users
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            if(userDominModel == null)
-            {
-                return NotFound();
-            }
-          
-            userDominModel.Code = updateUserRequestDto.Code;
-            userDominModel.Name = updateUserRequestDto.Name;
-            userDominModel.UserImageUrl = updateUserRequestDto.UserImageUrl;
-
-            microRentDbContext.SaveChanges();
-
-
-            var userDto = new UserDto
-            {
-                Id = userDominModel.Id,
-                Code = userDominModel.Code,
-                Name = userDominModel.Name,
-                UserImageUrl = userDominModel.UserImageUrl
-            };
-            return Ok(userDto);
-        }
-        [HttpDelete("{id:guid}")]
-        
-        public IActionResult Delete([FromRoute] Guid id)
-        {
-            var userDomainModel = microRentDbContext.Users.FirstOrDefault(x => x.Id == id);
             if (userDomainModel == null)
             {
                 return NotFound();
-        
             }
-            microRentDbContext.Users.Remove(userDomainModel);
-            microRentDbContext.SaveChanges();
+
+            userDomainModel.Code = updateUserRequestDto.Code;
+            userDomainModel.Name = updateUserRequestDto.Name;
+            userDomainModel.UserImageUrl = updateUserRequestDto.UserImageUrl;
+
+            await microRentDbContext.SaveChangesAsync();
 
             var userDto = new UserDto
             {
@@ -135,7 +116,35 @@ namespace MicroRentApi.Controllers
                 Code = userDomainModel.Code,
                 Name = userDomainModel.Name,
                 UserImageUrl = userDomainModel.UserImageUrl
-            }; 
+            };
+
+            return Ok(userDto);
+        }
+        [HttpDelete("{id:guid}")]
+
+       
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            var userDomainModel = await microRentDbContext.Users
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (userDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            microRentDbContext.Users.Remove(userDomainModel);
+
+            await microRentDbContext.SaveChangesAsync();
+
+            var userDto = new UserDto
+            {
+                Id = userDomainModel.Id,
+                Code = userDomainModel.Code,
+                Name = userDomainModel.Name,
+                UserImageUrl = userDomainModel.UserImageUrl
+            };
+
             return Ok(userDto);
         }
     }
